@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 
-// Layout Components
+// Layout Components (NO lazy for these)
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
@@ -9,26 +9,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ParticlesBG from "./components/ParticlesBG";
 import PremiumCursor from "./components/PrimiumCursor";
 
-// Public Pages
-import Home from "./pages/Home";
-import Services from "./pages/Services";
-import BookAppointment from "./pages/BookAppointment";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Gallery from "./pages/Gallery";
-import NotFound from "./pages/NotFound";
+// Lazy Loaded Pages
+const Home = lazy(() => import("./pages/Home"));
+const Services = lazy(() => import("./pages/Services"));
+const BookAppointment = lazy(() => import("./pages/BookAppointment"));
+const Contact = lazy(() => import("./pages/Contact"));
+const About = lazy(() => import("./pages/About"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Admin Pages
-import AdminLogin from "./pages/admin/AdminLogin";
-import Dashboard from "./pages/admin/Dashboard";
-import BookingCalendar from "./pages/admin/BookingCalendar";
-import AdminBookings from "./pages/AdminBookings";
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const BookingCalendar = lazy(() => import("./pages/admin/BookingCalendar"));
+const AdminBookings = lazy(() => import("./pages/AdminBookings"));
 
-// Reels Viewer
-import ReelsViewer from "./pages/ReelsViewer";
+const ReelsViewer = lazy(() => import("./pages/ReelsViewer"));
 
 function App() {
-
   const [showReels, setShowReels] = useState(false);
 
   const reelsVideos = [
@@ -38,7 +35,6 @@ function App() {
 
   return (
     <BrowserRouter>
-
       <div className="min-h-screen bg-[#020617] text-white flex flex-col relative overflow-x-hidden">
 
         {/* Premium Cursor */}
@@ -46,10 +42,12 @@ function App() {
 
         {/* Reels Viewer */}
         {showReels && (
-          <ReelsViewer
-            videos={reelsVideos}
-            onClose={() => setShowReels(false)}
-          />
+          <Suspense fallback={null}>
+            <ReelsViewer
+              videos={reelsVideos}
+              onClose={() => setShowReels(false)}
+            />
+          </Suspense>
         )}
 
         {/* Glow Background */}
@@ -69,55 +67,63 @@ function App() {
         {/* Main Content */}
         <main className="flex-grow relative z-10">
 
-          <Routes>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-yellow-400"></div>
+              </div>
+            }
+          >
+            <Routes>
 
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/book" element={<BookAppointment />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/book" element={<BookAppointment />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<About />} />
 
-            <Route
-              path="/gallery"
-              element={<Gallery openReels={() => setShowReels(true)} />}
-            />
+              <Route
+                path="/gallery"
+                element={<Gallery openReels={() => setShowReels(true)} />}
+              />
 
-            {/* Admin Login */}
-            <Route path="/admin-login" element={<AdminLogin />} />
+              {/* Admin Login */}
+              <Route path="/admin-login" element={<AdminLogin />} />
 
-            {/* Protected Admin Routes */}
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected Admin Routes */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/admin/bookings"
-              element={
-                <ProtectedRoute>
-                  <AdminBookings />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/admin/bookings"
+                element={
+                  <ProtectedRoute>
+                    <AdminBookings />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/admin/calendar"
-              element={
-                <ProtectedRoute>
-                  <BookingCalendar />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/admin/calendar"
+                element={
+                  <ProtectedRoute>
+                    <BookingCalendar />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* 404 Page */}
-            <Route path="*" element={<NotFound />} />
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
 
-          </Routes>
+            </Routes>
+          </Suspense>
 
         </main>
 
@@ -128,10 +134,8 @@ function App() {
         <Footer />
 
       </div>
-
     </BrowserRouter>
   );
 }
 
 export default App;
-

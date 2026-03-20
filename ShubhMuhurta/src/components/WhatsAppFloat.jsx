@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 
 export default function WhatsAppFloat() {
-  const phoneNumber = "8460846342"; // ⭐ replace with your father's number
+  const phoneNumber = "8460846342git add ."; // ⭐ replace with your father's number
   const message =
     "Namaste Pandit Ji, mujhe jyotish consultation chahiye.";
 
